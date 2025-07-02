@@ -4,6 +4,10 @@ import { UserRepository } from '#domain/repositories/user.repository'
 export class UsersInMemoryRepository implements UserRepository {
   private users: User[] = []
 
+  getUsers(): User[] {
+    return this.users
+  }
+
   updateUsername(id: string, username: string): Promise<User> {
     const user = this.users.find((u) => u.id === id)
     if (!user) {
