@@ -20,7 +20,7 @@ test.group('Users application use cases user get by email', () => {
     const userByEmail = await getUserByEmailUseCase.execute(userProps.email)
 
     assert.instanceOf(userByEmail, User)
-    assert.lengthOf(userRepo.users, 1)
-    assert.deepEqual(userRepo.users[0].props, userProps)
+    assert.lengthOf(userRepo.getUsers(), 1)
+    assert.deepEqual(userRepo.getUsers()[0].props, userProps)
   })
 })
