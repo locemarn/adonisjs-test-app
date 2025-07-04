@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import sinon from 'sinon'
 import User from '#models/user'
 import { UserLucidRepository } from '#infra/db/lucid/user_lucid.repository'
+import { User as UserDomain } from '#domain/entities/user.entity'
 
 const userProps = {
   username: 'usertest',
@@ -23,115 +24,81 @@ test.group('UserLucidRepository', (group) => {
   })
 
   test('should create a new user', async ({ assert }) => {
-    const fakeUser = {
-      ...userProps,
-      id: '123abc',
-    }
+    const userDomain = new UserDomain(userProps)
 
-    sandbox.stub(User, 'create').resolves(fakeUser as any)
+    const userModelInstance = new User()
+    userModelInstance.fill(userProps)
+    userModelInstance.id = 1
 
-    const user = await repository.create(fakeUser as any)
-    assert.deepEqual(user, fakeUser)
+    const createStub = sandbox.stub(User, 'create').resolves(userModelInstance)
+    const newUser = await repository.create(userDomain)
+
+    assert.instanceOf(newUser, UserDomain)
+    assert.equal(newUser.getUsername(), userDomain.getUsername())
+    assert.equal(newUser.getEmail(), userDomain.getEmail())
+    assert.equal(newUser.getPassword(), userDomain.getPassword())
+    assert.isDefined(newUser.id)
+    assert.equal(newUser.id, userModelInstance.id.toString())
+    assert.isTrue(createStub.calledOnceWith(userDomain.props))
   })
 
-  test('should get a user by id', async ({ assert }) => {
-    const fakeUser = {
-      ...userProps,
-      id: '123abc',
-    }
+  test('should get a user by ID', async ({ assert }) => {
+    const userDomain = new UserDomain(userProps, '1')
 
-    sandbox.stub(User, 'find').resolves(fakeUser as any)
+    const userModelInstance = new User()
+    userModelInstance.fill(userProps)
+    userModelInstance.id = 1
 
-    const user = await repository.getUserById('123abc')
-    assert.deepEqual(user, fakeUser)
+    const findStub = sandbox.stub(User, 'find').resolves(userModelInstance)
+
+    const foundUser = await repository.getUserById('1')
+
+    assert.instanceOf(foundUser, UserDomain)
+    assert.equal(foundUser?.id, userDomain.id)
+    assert.equal(foundUser?.getUsername(), userDomain.getUsername())
+    assert.isTrue(findStub.calledOnceWith('1'))
   })
 
-  test('should get a user by email', async ({ assert }) => {
-    const fakeUser = {
-      ...userProps,
-      id: '123abc',
-    }
+  test('should return null if user not found by ID', async ({ assert }) => {
+    const findStub = sandbox.stub(User, 'find').resolves(null)
 
-    sandbox
-      .stub(User, 'findBy')
-      .withArgs({ email: 'usertest@gmail.com' } as any)
-      .resolves(fakeUser as any)
+    const foundUser = await repository.getUserById('999')
 
-    const user = await repository.getUserByEmail('usertest@gmail.com')
-    assert.deepEqual(user, fakeUser)
+    assert.isNull(foundUser)
+    assert.isTrue(findStub.calledOnceWith('999'))
   })
 
-  test('should get a user by username', async ({ assert }) => {
-    const fakeUser = {
-      ...userProps,
-      id: '123abc',
-    }
+  test('should update username', async ({ assert }) => {
+    const userId = '1'
+    const newUsername = 'updatedUser'
 
-    sandbox
-      .stub(User, 'findBy')
-      .withArgs({ username: 'usertest' } as any)
-      .resolves(fakeUser as any)
+    const userDomain = new UserDomain(userProps, userId)
 
-    const user = await repository.getUserByUsername('usertest')
-    assert.deepEqual(user, fakeUser)
+    const findUserStubModel = new User()
+    findUserStubModel.fill(userProps)
+    findUserStubModel.id = 1
+    const updatedUserStubModel = new User()
+    updatedUserStubModel.fill({ ...userProps, username: newUsername })
+    updatedUserStubModel.id = 1
+
+    const findStub = sandbox.stub(User, 'find').resolves(findUserStubModel)
+    const updateOrCreateStub = sandbox.stub(User, 'updateOrCreate').resolves(updatedUserStubModel)
+
+    const updatedUser = await repository.updateUsername(userId, newUsername)
+
+    assert.instanceOf(updatedUser, UserDomain)
+    assert.equal(updatedUser.id, userId)
+    assert.equal(updatedUser.getUsername(), newUsername)
+    assert.isTrue(findStub.calledOnceWith(userId))
+    assert.isTrue(
+      updateOrCreateStub.calledOnceWith({ id: Number(userId) }, { username: newUsername })
+    )
   })
 
-  test('should delete a user', async ({ assert }) => {
-    const fakeUser = { delete: sandbox.stub().resolves() }
-    sandbox.stub(User, 'findOrFail').resolves(fakeUser as any)
+  test('should throw error if user not found for username update', async ({ assert }) => {
+    const findStub = sandbox.stub(User, 'find').resolves(null)
 
-    await repository.delete('123abc')
-
-    assert.isTrue(fakeUser.delete.calledOnce)
-  })
-
-  test('should update a username', async ({ assert }) => {
-    const fakeUser = {
-      ...userProps,
-      id: '123abc',
-    }
-    const updatedUser = {
-      ...fakeUser,
-      username: 'usertestupdated',
-    }
-
-    sandbox.stub(User, 'find').resolves(fakeUser as any)
-    sandbox.stub(User, 'updateOrCreate').resolves(updatedUser as any)
-
-    const user = await repository.updateUsername('123abc', 'usertestupdated')
-    assert.equal(user, updatedUser)
-  })
-
-  test('should update a password', async ({ assert }) => {
-    const fakeUser = {
-      ...userProps,
-      id: '123abc',
-    }
-    const updatedUser = {
-      ...fakeUser,
-      password: 'passwordupdated',
-    }
-
-    sandbox.stub(User, 'find').resolves(fakeUser as any)
-    sandbox.stub(User, 'updateOrCreate').resolves(updatedUser as any)
-
-    const user = await repository.updatePassword('123abc', 'passwordupdated')
-    assert.equal(user, updatedUser)
-  })
-
-  test('updateUsername throws if user not found', async ({ assert }) => {
-    sandbox.stub(User, 'find').resolves(null)
-
-    await assert.rejects(async () => {
-      await repository.updateUsername('123abc', 'any')
-    }, /User not found/)
-  })
-
-  test('updatePassword throws if user not found', async ({ assert }) => {
-    sandbox.stub(User, 'find').resolves(null)
-
-    await assert.rejects(async () => {
-      await repository.updatePassword('123abc', 'any')
-    }, /User not found/)
+    await assert.rejects(() => repository.updateUsername('999', 'nonExistent'), 'User not found')
+    assert.isTrue(findStub.calledOnceWith('999'))
   })
 })

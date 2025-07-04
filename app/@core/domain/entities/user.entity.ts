@@ -25,6 +25,10 @@ export class User {
     this.id = id || crypto.randomUUID()
   }
 
+  static create(props: UserProps, id?: string) {
+    return new User(props, id)
+  }
+
   updateUsername(username: string) {
     if (!username || username.trim() === '' || username.length < 3) {
       throw new Error('Invalid username.')
