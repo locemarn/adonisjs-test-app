@@ -17,9 +17,10 @@ test.group('Users infra db', (group) => {
     const user = new User(userProps)
     await repo.create(user)
 
-    assert.instanceOf(repo.users[0], User)
-    assert.lengthOf(repo.users, 1)
-    assert.deepEqual(repo.users[0].props, userProps)
+    const users = repo.getUsers()
+    assert.instanceOf(users[0], User)
+    assert.lengthOf(users, 1)
+    assert.deepEqual(users[0].props, userProps)
   })
 
   test('should get a user by id', async ({ assert }) => {
@@ -29,8 +30,8 @@ test.group('Users infra db', (group) => {
 
     const userById = await repo.getUserById(user.id)
     assert.instanceOf(userById, User)
-    assert.lengthOf(repo.users, 1)
-    assert.deepEqual(repo.users[0].props, userProps)
+    assert.lengthOf(repo.getUsers(), 1)
+    assert.deepEqual(repo.getUsers()[0].props, userProps)
   })
 
   test('should get a user by email', async ({ assert }) => {
@@ -40,8 +41,8 @@ test.group('Users infra db', (group) => {
 
     const userByEmail = await repo.getUserByEmail(user.props.email)
     assert.instanceOf(userByEmail, User)
-    assert.lengthOf(repo.users, 1)
-    assert.deepEqual(repo.users[0].props, userProps)
+    assert.lengthOf(repo.getUsers(), 1)
+    assert.deepEqual(repo.getUsers()[0].props, userProps)
   })
 
   test('should get a user by username', async ({ assert }) => {
@@ -51,7 +52,7 @@ test.group('Users infra db', (group) => {
 
     const userByUsername = await repo.getUserByUsername(user.props.username)
     assert.instanceOf(userByUsername, User)
-    assert.lengthOf(repo.users, 1)
-    assert.deepEqual(repo.users[0].props, userProps)
+    assert.lengthOf(repo.getUsers(), 1)
+    assert.deepEqual(repo.getUsers()[0].props, userProps)
   })
 })

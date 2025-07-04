@@ -5,7 +5,7 @@ services:
     image: postgres:15-alpine
     container_name: adonisjs-db
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      test: ['CMD', 'pg_isready', '-U', '${DB_USER}']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
     image: redis:7-alpine
     container_name: adonisjs-redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis-data:/data
     environment:
@@ -31,7 +31,7 @@ services:
       redis-server 
       --requirepass ${REDIS_PASSWORD}
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -41,7 +41,7 @@ services:
     container_name: redis-insight
     restart: unless-stopped
     ports:
-      - "5540:5540"
+      - '5540:5540'
     networks:
       - redis-network
     depends_on:
