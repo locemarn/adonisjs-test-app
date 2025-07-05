@@ -1,8 +1,8 @@
-import { UserRepository } from '#domain/repositories/user.repository'
+import { UserRepositoryInterface } from '#domain/repositories/user.repository'
 import cash from '#services/cache_service'
 
 export class GetUserByUsernameUseCase {
-  constructor(private userRepo: UserRepository) {}
+  constructor(private userRepo: UserRepositoryInterface) {}
 
   async execute(username: string) {
     if (cash.has(username)) {

@@ -1,11 +1,11 @@
-import { UserRepository } from '#domain/repositories/user.repository'
-import cash from '#services/cache_service'
+import { UserRepositoryInterface } from '#domain/repositories/user.repository'
+// import cash from '#services/cache_service'
 
 export class DeleteUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: UserRepositoryInterface) {}
 
-  async execute(id: string): Promise<void> {
-    cash.delete(id)
+  async execute(id: number): Promise<void> {
+    // cash.delete(id.toString())
     await this.userRepository.delete(id)
   }
 }

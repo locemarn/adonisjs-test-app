@@ -17,7 +17,7 @@ test.group('Users application use cases user get by id', () => {
     const user = await createUserUseCase.execute(userProps)
 
     const getUserByIdUseCase = new GetUserByIdUseCase(userRepo)
-    const userById = await getUserByIdUseCase.execute(user.id)
+    const userById = await getUserByIdUseCase.execute(user.id as number)
 
     assert.instanceOf(userById, User)
     assert.lengthOf(userRepo.getUsers(), 1)
