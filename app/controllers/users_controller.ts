@@ -10,7 +10,6 @@ export default class UsersController {
   }
 
   async createUser(ctx: HttpContext) {
-    console.log(' ctx --->', ctx.request.body())
     const createUserUseCase = new CreateUserUseCase(this.userRepo)
     const newUser = await createUserUseCase.execute(ctx.request.body() as UserProps)
     return newUser

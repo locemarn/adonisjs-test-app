@@ -43,7 +43,7 @@ test.group('UserLucidRepository', (group) => {
   })
 
   test('should get a user by ID', async ({ assert }) => {
-    const userDomain = new UserDomain(userProps, '1')
+    const userDomain = new UserDomain(userProps, 1)
 
     const userModelInstance = new User()
     userModelInstance.fill(userProps)
@@ -51,25 +51,25 @@ test.group('UserLucidRepository', (group) => {
 
     const findStub = sandbox.stub(User, 'find').resolves(userModelInstance)
 
-    const foundUser = await repository.getUserById('1')
+    const foundUser = await repository.getUserById(1)
 
     assert.instanceOf(foundUser, UserDomain)
     assert.equal(foundUser?.id, userDomain.id)
     assert.equal(foundUser?.getUsername(), userDomain.getUsername())
-    assert.isTrue(findStub.calledOnceWith('1'))
+    assert.isTrue(findStub.calledOnceWith(1))
   })
 
   test('should return null if user not found by ID', async ({ assert }) => {
     const findStub = sandbox.stub(User, 'find').resolves(null)
 
-    const foundUser = await repository.getUserById('999')
+    const foundUser = await repository.getUserById(999)
 
     assert.isNull(foundUser)
-    assert.isTrue(findStub.calledOnceWith('999'))
+    assert.isTrue(findStub.calledOnceWith(999))
   })
 
   test('should update username', async ({ assert }) => {
-    const userId = '1'
+    const userId = 1
     const newUsername = 'updatedUser'
 
     const userDomain = new UserDomain(userProps, userId)
@@ -98,7 +98,7 @@ test.group('UserLucidRepository', (group) => {
   test('should throw error if user not found for username update', async ({ assert }) => {
     const findStub = sandbox.stub(User, 'find').resolves(null)
 
-    await assert.rejects(() => repository.updateUsername('999', 'nonExistent'), 'User not found')
-    assert.isTrue(findStub.calledOnceWith('999'))
+    await assert.rejects(() => repository.updateUsername(999, 'nonExistent'), 'User not found')
+    assert.isTrue(findStub.calledOnceWith(999))
   })
 })

@@ -1,16 +1,16 @@
-import { UserRepository } from '#domain/repositories/user.repository'
+import { UserRepositoryInterface } from '#domain/repositories/user.repository'
 import UserModel from '#models/user'
 import { User as DomainUser, UserProps } from '#domain/entities/user.entity'
 
-export class UserLucidRepository implements UserRepository {
+export class UserLucidRepository implements UserRepositoryInterface {
   constructor() {}
 
-  async getUserById(id: string): Promise<DomainUser | null> {
+  async getUserById(id: number): Promise<DomainUser | null> {
     const user = await UserModel.find(id)
     if (!user) {
       return null
     }
-    return new DomainUser(user as UserProps, user.id.toString())
+    return new DomainUser(user as UserProps, user.id)
   }
 
   async getUserByEmail(email: string): Promise<DomainUser | null> {
@@ -18,7 +18,7 @@ export class UserLucidRepository implements UserRepository {
     if (!user) {
       return null
     }
-    return new DomainUser(user as UserProps, user.id.toString())
+    return new DomainUser(user as UserProps, user.id)
   }
 
   async getUserByUsername(username: string): Promise<DomainUser | null> {
@@ -26,34 +26,34 @@ export class UserLucidRepository implements UserRepository {
     if (!user) {
       return null
     }
-    return new DomainUser(user as UserProps, user.id.toString())
+    return new DomainUser(user as UserProps, user.id)
   }
 
   async create(user: DomainUser): Promise<DomainUser> {
     const createdUser = await UserModel.create(user.props)
-    return new DomainUser(createdUser as UserProps, createdUser.id.toString())
+    return new DomainUser(createdUser as UserProps, createdUser.id)
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const user = await UserModel.findOrFail(id)
     await user.delete()
   }
 
-  async updateUsername(id: string, username: string): Promise<DomainUser> {
+  async updateUsername(id: number, username: string): Promise<DomainUser> {
     const findUser = await UserModel.find(id)
     if (!findUser) {
       throw new Error('User not found')
     }
-    const user = await UserModel.updateOrCreate({ id: Number(id) }, { username })
-    return new DomainUser(user as UserProps, user.id.toString())
+    const user = await UserModel.updateOrCreate({ id }, { username })
+    return new DomainUser(user as UserProps, user.id)
   }
 
-  async updatePassword(id: string, password: string): Promise<DomainUser> {
+  async updatePassword(id: number, password: string): Promise<DomainUser> {
     const findUser = await UserModel.find(id)
     if (!findUser) {
       throw new Error('User not found')
     }
-    const user = await UserModel.updateOrCreate({ id: Number(id) }, { password })
-    return new DomainUser(user as UserProps, user.id.toString())
+    const user = await UserModel.updateOrCreate({ id }, { password })
+    return new DomainUser(user as UserProps, user.id)
   }
 }

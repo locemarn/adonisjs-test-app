@@ -36,7 +36,6 @@ export class UserRedisRepository implements UserRepository {
     if (!user) {
       throw new Error('User not found')
     }
-    console.log('user --->', user)
     user.props.username = username
     await redis.set(id, JSON.stringify(user))
     return user

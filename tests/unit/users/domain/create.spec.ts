@@ -14,7 +14,6 @@ test.group('Users Entity - Create', () => {
     assert.equal(user.getUsername(), 'usertester')
     assert.equal(user.getEmail(), 'usertester@gmail.com')
     assert.equal(user.getPassword(), 'password')
-    assert.isString(user.id)
   })
 
   test('should throw an error if username is empty', async ({ assert }) => {
@@ -116,7 +115,6 @@ test.group('Users Entity to JSON', () => {
       id: user.id,
       username: 'usertester',
       email: 'usertester@gmail.com',
-      password: 'password',
     })
   })
 })

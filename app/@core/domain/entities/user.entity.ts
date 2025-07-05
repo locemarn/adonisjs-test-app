@@ -6,9 +6,9 @@ export type UserProps = {
 
 export class User {
   public props: Required<UserProps>
-  public readonly id: string
+  public readonly id?: number
 
-  constructor(props: UserProps, id?: string) {
+  constructor(props: UserProps, id?: number) {
     if (
       !props.username ||
       !props.email ||
@@ -22,10 +22,12 @@ export class User {
       throw new Error('Invalid user props.')
     }
     this.props = props
-    this.id = id || crypto.randomUUID()
+    if (id !== undefined) {
+      this.id = id
+    }
   }
 
-  static create(props: UserProps, id?: string) {
+  static create(props: UserProps, id?: number) {
     return new User(props, id)
   }
 
@@ -60,7 +62,6 @@ export class User {
       id: this.id,
       username: this.props.username,
       email: this.props.email,
-      password: this.props.password,
     }
   }
 }
