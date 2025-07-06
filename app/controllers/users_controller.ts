@@ -10,6 +10,15 @@ import { GetUserByUsernameUseCase } from '#application/use_cases/users/get_user_
 import { DeleteUserUseCase } from '#application/use_cases/users/delete_user.use_case'
 import { UpdatePasswordUseCase } from '#application/use_cases/users/update_password.use_case'
 import { UserRepositoryInterface } from '#domain/repositories/user.repository'
+import {
+  userCreateValidator,
+  userGetByIdValidator,
+  userGetByEmailValidator,
+  userGetByUsernameValidator,
+  updateUserUsernameValidator,
+  updateUserPasswordValidator,
+  deleteUserValidator,
+} from '#validators/user'
 
 export default class UsersController {
   private readonly userRepo: UserRepositoryInterface
@@ -19,6 +28,9 @@ export default class UsersController {
   }
 
   async createUser({ request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(userCreateValidator)
+
     try {
       const createUserUseCase = new CreateUserUseCase(this.userRepo)
       const newUser = await createUserUseCase.execute(request.body() as UserProps)
@@ -28,7 +40,9 @@ export default class UsersController {
     }
   }
 
-  async getUserById({ params, response }: HttpContext) {
+  async getUserById({ params, request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(userGetByIdValidator)
     try {
       const getUserByIdUseCase = new GetUserByIdUseCase(this.userRepo)
       const user = await getUserByIdUseCase.execute(Number(params.id))
@@ -38,7 +52,9 @@ export default class UsersController {
     }
   }
 
-  async getUserByEmail({ params, response }: HttpContext) {
+  async getUserByEmail({ params, request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(userGetByEmailValidator)
     try {
       const getUserByEmailUseCase = new GetUserByEmailUseCase(this.userRepo)
       const user = await getUserByEmailUseCase.execute(params.email)
@@ -48,7 +64,9 @@ export default class UsersController {
     }
   }
 
-  async getUserByUsername({ params, response }: HttpContext) {
+  async getUserByUsername({ params, request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(userGetByUsernameValidator)
     try {
       const getUserByUsernameUseCase = new GetUserByUsernameUseCase(this.userRepo)
       const user = await getUserByUsernameUseCase.execute(params.username)
@@ -59,6 +77,8 @@ export default class UsersController {
   }
 
   async updateUserUsername({ params, request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(updateUserUsernameValidator)
     try {
       const { username } = request.body()
       const updateUsernameUseCase = new UpdateUsernameUseCase(this.userRepo)
@@ -70,6 +90,8 @@ export default class UsersController {
   }
 
   async updateUserPassword({ params, request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(updateUserPasswordValidator)
     try {
       const { password } = request.body()
       const updatePasswordUseCase = new UpdatePasswordUseCase(this.userRepo)
@@ -80,7 +102,9 @@ export default class UsersController {
     }
   }
 
-  async deleteUser({ params, response }: HttpContext) {
+  async deleteUser({ params, request, response }: HttpContext) {
+    // Validate request
+    await request.validateUsing(deleteUserValidator)
     try {
       const deleteUserUseCase = new DeleteUserUseCase(this.userRepo)
       await deleteUserUseCase.execute(Number(params.id))
