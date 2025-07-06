@@ -28,7 +28,7 @@ test.group('Users infra db', (group) => {
     const user = new User(userProps)
     await repo.create(user)
 
-    const userById = await repo.getUserById(user.id)
+    const userById = await repo.getUserById(user.id as number)
     assert.instanceOf(userById, User)
     assert.lengthOf(repo.getUsers(), 1)
     assert.deepEqual(repo.getUsers()[0].props, userProps)

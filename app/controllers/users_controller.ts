@@ -9,51 +9,84 @@ import { GetUserByEmailUseCase } from '#application/use_cases/users/get_user_by_
 import { GetUserByUsernameUseCase } from '#application/use_cases/users/get_user_by_username.use_case'
 import { DeleteUserUseCase } from '#application/use_cases/users/delete_user.use_case'
 import { UpdatePasswordUseCase } from '#application/use_cases/users/update_password.use_case'
+import { UserRepositoryInterface } from '#domain/repositories/user.repository'
 
 export default class UsersController {
-  constructor(private readonly userRepo: UserLucidRepository) {
+  private readonly userRepo: UserRepositoryInterface
+
+  constructor() {
     this.userRepo = new UserLucidRepository()
   }
 
-  async createUser(ctx: HttpContext) {
-    const createUserUseCase = new CreateUserUseCase(this.userRepo)
-    const newUser = await createUserUseCase.execute(ctx.request.body() as UserProps)
-    return newUser
+  async createUser({ request, response }: HttpContext) {
+    try {
+      const createUserUseCase = new CreateUserUseCase(this.userRepo)
+      const newUser = await createUserUseCase.execute(request.body() as UserProps)
+      response.status(201).json({ data: newUser, message: 'User created', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 
-  async getUserById(id: number) {
-    const getUserByIdUseCase = new GetUserByIdUseCase(this.userRepo)
-    const user = await getUserByIdUseCase.execute(id)
-    return user
+  async getUserById({ params, response }: HttpContext) {
+    try {
+      const getUserByIdUseCase = new GetUserByIdUseCase(this.userRepo)
+      const user = await getUserByIdUseCase.execute(Number(params.id))
+      response.status(200).json({ data: user, message: 'User found', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 
-  async getUserByEmail(email: string) {
-    const getUserByEmailUseCase = new GetUserByEmailUseCase(this.userRepo)
-    const user = await getUserByEmailUseCase.execute(email)
-    return user
+  async getUserByEmail({ params, response }: HttpContext) {
+    try {
+      const getUserByEmailUseCase = new GetUserByEmailUseCase(this.userRepo)
+      const user = await getUserByEmailUseCase.execute(params.email)
+      response.status(200).json({ data: user, message: 'User found', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 
-  async getUserByUsername(username: string) {
-    const getUserByUsernameUseCase = new GetUserByUsernameUseCase(this.userRepo)
-    const user = await getUserByUsernameUseCase.execute(username)
-    return user
+  async getUserByUsername({ params, response }: HttpContext) {
+    try {
+      const getUserByUsernameUseCase = new GetUserByUsernameUseCase(this.userRepo)
+      const user = await getUserByUsernameUseCase.execute(params.username)
+      response.status(200).json({ data: user, message: 'User found', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 
-  async updateUserUsername(id: number, username: string) {
-    const updateUsernameUseCase = new UpdateUsernameUseCase(this.userRepo)
-    const user = await updateUsernameUseCase.execute(id, username)
-    return user
+  async updateUserUsername({ params, request, response }: HttpContext) {
+    try {
+      const { username } = request.body()
+      const updateUsernameUseCase = new UpdateUsernameUseCase(this.userRepo)
+      const user = await updateUsernameUseCase.execute(Number(params.id), username)
+      response.status(200).json({ data: user, message: 'User updated', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 
-  async updateUserPassword(id: number, password: string) {
-    const updatePasswordUseCase = new UpdatePasswordUseCase(this.userRepo)
-    const user = await updatePasswordUseCase.execute(id, password)
-    return user
+  async updateUserPassword({ params, request, response }: HttpContext) {
+    try {
+      const { password } = request.body()
+      const updatePasswordUseCase = new UpdatePasswordUseCase(this.userRepo)
+      const user = await updatePasswordUseCase.execute(Number(params.id), password)
+      response.status(200).json({ data: user, message: 'User updated', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 
-  async deleteUser(id: number) {
-    const deleteUserUseCase = new DeleteUserUseCase(this.userRepo)
-    await deleteUserUseCase.execute(id)
-    return 'User deleted'
+  async deleteUser({ params, response }: HttpContext) {
+    try {
+      const deleteUserUseCase = new DeleteUserUseCase(this.userRepo)
+      await deleteUserUseCase.execute(Number(params.id))
+      response.status(200).json({ message: 'User deleted', error: false })
+    } catch (error) {
+      response.status(400).json({ message: error.detail, error: true })
+    }
   }
 }

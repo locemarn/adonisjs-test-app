@@ -30,8 +30,12 @@ export class UserLucidRepository implements UserRepositoryInterface {
   }
 
   async create(user: DomainUser): Promise<DomainUser> {
-    const createdUser = await UserModel.create(user.props)
-    return new DomainUser(createdUser as UserProps, createdUser.id)
+    try {
+      const createdUser = await UserModel.create(user.props)
+      return new DomainUser(createdUser as UserProps, createdUser.id)
+    } catch (error) {
+      throw error
+    }
   }
 
   async delete(id: number): Promise<void> {
