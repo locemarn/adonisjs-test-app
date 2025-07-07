@@ -1,20 +1,27 @@
+import { RedisConnection } from '@adonisjs/redis'
+import redis from '@adonisjs/redis/services/main'
+
 class CacheService {
-  #store: Record<string, any> = {}
+  #store: RedisConnection
+
+  constructor() {
+    this.#store = redis.connection('main')
+  }
 
   has(key: string) {
-    return key in this.#store
+    return this.#store.exists(key)
   }
 
-  get(key: string) {
-    return this.#store[key]
+  async get(key: string) {
+    return await this.#store.get(key)
   }
 
-  set(key: string, value: any) {
-    this.#store[key] = value
+  async set(key: string, value: any) {
+    await this.#store.hset(key, value)
   }
 
   delete(key: string) {
-    delete this.#store[key]
+    this.#store.del(key)
   }
 }
 

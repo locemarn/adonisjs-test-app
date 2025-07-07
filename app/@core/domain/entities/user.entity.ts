@@ -21,7 +21,12 @@ export class User {
     ) {
       throw new Error('Invalid user props.')
     }
-    this.props = props
+
+    this.props = {
+      username: props.username,
+      email: props.email,
+      password: props.password,
+    }
     if (id !== undefined) {
       this.id = id
     }

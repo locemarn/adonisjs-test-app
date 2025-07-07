@@ -1,6 +1,7 @@
 import { UserRepositoryInterface } from '#domain/repositories/user.repository'
 import UserModel from '#models/user'
 import { User as DomainUser, UserProps } from '#domain/entities/user.entity'
+import UserRegistered from '#events/user_registered'
 
 export class UserLucidRepository implements UserRepositoryInterface {
   constructor() {}
@@ -32,7 +33,9 @@ export class UserLucidRepository implements UserRepositoryInterface {
   async create(user: DomainUser): Promise<DomainUser> {
     try {
       const createdUser = await UserModel.create(user.props)
-      return new DomainUser(createdUser as UserProps, createdUser.id)
+      const userDomain = new DomainUser(createdUser, createdUser.id)
+      UserRegistered.dispatch(userDomain)
+      return userDomain
     } catch (error) {
       throw error
     }
